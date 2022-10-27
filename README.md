@@ -1,13 +1,18 @@
-=== BEGIN ANDREASFRANKE ===================================================================================
+=== BEGIN ANDREASFRANKE ==========================================================================
+
 Because it is not possible for me to build package on my own following modification are necessary. 
+
 1a. qdep: after generation of the qdep.prf file copy qdep.exe and qdep-script.py from "C:\Program Files\Anaconda3\Scripts\" to a location without SPACES in path.
+
 1b. qdep: modify QDEP_PATH in qdep.prf file to path above.
+
 1c. qdep optional: generate a qdep.prf with "--dir /some/path" and use "set QMAKEPATH=/some/path" for custom file and modify like above.
 
 2. For VS2022 build in CMD 'call "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat"' of x64 target
+
 3. Target Qt have to be set to PATH "set PATH=C:\Qt\5.15.11\msvc2019_64\bin;%PATH%"
 
-=== END ANDREASFRANKE ===================================================================================
+=== END ANDREASFRANKE ============================================================================
 
 # QtService
 A platform independent library to easily create system services and use some of their features
