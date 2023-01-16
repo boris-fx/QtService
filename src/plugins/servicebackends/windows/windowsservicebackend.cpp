@@ -43,6 +43,8 @@
 #include "windowsserviceplugin.h"
 #include <iostream>
 #include <QtCore/QFileInfo>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 using namespace QtService;
 
 #define SVCNAME const_cast<wchar_t*>(reinterpret_cast<const wchar_t*>(QCoreApplication::applicationName().utf16()))
@@ -73,11 +75,34 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	Q_UNUSED(argc)
 	Q_UNUSED(argv)
-	xPath = QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath();
-	qInstallMessageHandler(WindowsServiceBackend::winsvcMessageHandler);
 
 	// if not set: get the app name from it's basename
 	Q_ASSERT_X(!QCoreApplication::applicationName().isEmpty(), Q_FUNC_INFO, "QCoreApplication::applicationName must be set before starting a windows service!");
+
+	QCommandLineParser parser;
+	parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
+
+	QCommandLineOption logFile({"l", "log"});
+	logFile.setDescription("Defines the path of the log file.");
+	logFile.setValueName("logFile");
+	parser.addOption(logFile);
+
+
+	{
+		QCoreApplication a(argc, argv);
+		parser.parse(a.arguments());
+	}
+
+	if (parser.isSet(logFile))
+	{
+		xPath = QFileInfo{parser.value(logFile)}.dir().absolutePath();
+	} 
+	else
+	{
+		xPath = QFileInfo{ QString::fromUtf8(argv[0]) }.dir().absolutePath();
+	}
+
+	qInstallMessageHandler(WindowsServiceBackend::winsvcMessageHandler);
 
 	// start handler and wait for service init
 	SvcControlThread controlThread{this};
