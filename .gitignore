@@ -77,3 +77,4 @@ vendor
 qpmx.user.json
 qtservice_win.pro
 *.json.user
+.vshistory/
