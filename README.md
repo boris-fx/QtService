@@ -10,7 +10,7 @@ Because it is not possible for me to build package on my own following modificat
 
 2. For VS2022 build in CMD 'call "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat"' of x64 target
 
-3. Target Qt have to be set to PATH "set PATH=C:\Qt\5.15.11\msvc2019_64\bin;%PATH%"
+3. Target Qt have to be set to PATH "set PATH=C:\Qt\5.15.12\msvc2019_64\bin;%PATH%"
 
 === END ANDREASFRANKE ============================================================================
 
@@ -64,7 +64,7 @@ Details on what exactly is supported by each backend can be found in the doxygen
 		- On Linux: https://install.skycoder42.de/qtmodules/linux_x64
 		- On Windows: https://install.skycoder42.de/qtmodules/windows_x86
 		- On Mac: https://install.skycoder42.de/qtmodules/mac_x64
-	2. A new entry appears under all supported Qt Versions (e.g. `Qt > Qt 5.11 > Skycoder42 Qt modules`)
+	2. A new entry appears under all supported Qt Versions (e.g. `Qt > Qt 5.12 > Skycoder42 Qt modules`)
 	3. You can install either all of my modules, or select the one you need: `Qt Service`
 	4. Continue the setup and thats it! you can now use the module for all of your installed Kits for that Qt Version
 3. Download the compiled modules from the release page. **Note:** You will have to add the correct ones yourself and may need to adjust some paths to fit your installation! In addition to that, you will have to download the modules this one depends on as well.
