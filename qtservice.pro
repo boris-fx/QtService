@@ -1,26 +1,30 @@
-load(qt_parts)
+#load(qt_parts)
 
-SUBDIRS += doc
+TEMPLATE = subdirs
+
+SUBDIRS += src
+
+#SUBDIRS += doc
 
 doxygen.target = doxygen
 doxygen.CONFIG = recursive
 doxygen.recurse_target = doxygen
 doxygen.recurse += doc
-QMAKE_EXTRA_TARGETS += doxygen
+#QMAKE_EXTRA_TARGETS += doxygen
 
 runtests.target = run-tests
 runtests.CONFIG = recursive
 runtests.recurse_target = run-tests
 runtests.recurse += sub_tests sub_src
-QMAKE_EXTRA_TARGETS += runtests
+#QMAKE_EXTRA_TARGETS += runtests
 
 lupdate.target = lupdate
 lupdate.CONFIG = recursive
 lupdate.recurse_target = lupdate
 lupdate.recurse += sub_src
-QMAKE_EXTRA_TARGETS += lupdate
+#QMAKE_EXTRA_TARGETS += lupdate
 
 DISTFILES += .qmake.conf \
 	sync.profile \
-        .github/workflows/build.yml \
+		.github/workflows/build.yml \
 	ProjectTemplate/*
