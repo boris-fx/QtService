@@ -17,7 +17,7 @@ cd buildQtService\
 
 echo current dir %CD%
 set PATH=%PATH%;C:\Qt\5.15.12\msvc2019_64\bin
-set QMAKEPATH=C:\Users\frn9bh\source\repos\qdepservice
+REM set QMAKEPATH=C:\Users\frn9bh\source\repos\qdepservice
 qmake ..\QtService\
 nmake
 nmake all
