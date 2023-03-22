@@ -20,3 +20,8 @@ runtarget.target = run-tests
 	else: runtarget.depends += $(TARGET)
 }
 QMAKE_EXTRA_TARGETS += runtarget
+
+# Docs at https://doc.qt.io/qt-5/qmake-variable-reference.html say:
+# "When relative paths are specified, qmake will mangle them into a form understood by the
+#  dynamic linker to be relative to the location of the referring executable or library."
+macos: QMAKE_RPATHDIR = ../../../../lib  # to find QtService.framework not installed into Qt
