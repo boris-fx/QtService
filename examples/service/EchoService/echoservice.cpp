@@ -102,7 +102,7 @@ void EchoService::newConnection()
 			socket->close();
 			socket->deleteLater();
 		});
-		connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error),
+		connect(socket, &QTcpSocket::errorOccurred,
 				socket, [socket](QAbstractSocket::SocketError error) {
 			qWarning() << host(socket) << "Socket-Error[" << error << "]:" << qUtf8Printable(socket->errorString());
 		});
