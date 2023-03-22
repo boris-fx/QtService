@@ -32,9 +32,11 @@ public:
 
 }
 
+QT_BEGIN_NAMESPACE
 //! The IID to be used to create a service plugin
 #define QtService_ServicePlugin_Iid "de.skycoder42.QtService.ServicePlugin"
 Q_DECLARE_INTERFACE(QtService::ServicePlugin, QtService_ServicePlugin_Iid)
+QT_END_NAMESPACE
 
 //! @file serviceplugin.h The ServicePlugin header
 #endif // QTSERVICE_SERVICEPLUGIN_H
