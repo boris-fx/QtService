@@ -37,12 +37,13 @@ win32 {
 	QMAKE_TARGET_PRODUCT = "QtService"
 	QMAKE_TARGET_COMPANY = "Skycoder42"
 	QMAKE_TARGET_COPYRIGHT = "Felix Barz"
-} else:mac {
+} else: macos {
 	QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
+
+	CONFIG(debug, debug|release) {  # need this for plugins' linkage
+		!isEmpty(QMAKE_POST_LINK): QMAKE_POST_LINK += &&
+		QMAKE_POST_LINK += \
+			( cd \"$$shadowed($$dirname(_QMAKE_CONF_))/lib/QtService.framework\" && \
+				( test -e QtService || ln -s QtService_debug QtService ) ; cd - ) 
+	}
 }
-
-#QDEP_DEPENDS += \
-#	Skycoder42/QCtrlSignals@1.2.0 \
-#	Skycoder42/QConsole@1.3.1
-
-#!load(qdep):error("Failed to load qdep feature! Run 'qdep prfgen --qmake $$QMAKE_QMAKE' to create it.")
