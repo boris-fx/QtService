@@ -1,5 +1,5 @@
 runtarget.target = run-tests
-debug_and_release:!ReleaseBuild:!DebugBuild {
+debug_and_release: !build_pass {
 	runtarget.CONFIG = recursive
 	runtarget.recurse_target = run-tests
 	QMAKE_EXTRA_TARGETS += runtarget

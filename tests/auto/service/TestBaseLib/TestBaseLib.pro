@@ -17,8 +17,13 @@ SOURCES += \
 	basicservicetest.cpp
 
 runtarget.target = run-tests
-!compat_test {
-	win32: runtarget.depends += $(DESTDIR_TARGET)
-	else: runtarget.depends += $(TARGET)
+debug_and_release: !build_pass {
+	runtarget.CONFIG = recursive
+	runtarget.recurse_target = run-tests
+} else {
+	!compat_test {
+		win32: runtarget.depends += $(DESTDIR_TARGET)
+		else: runtarget.depends += $(TARGET)
+	}
 }
 QMAKE_EXTRA_TARGETS += runtarget
