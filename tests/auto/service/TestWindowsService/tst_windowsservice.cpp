@@ -46,19 +46,19 @@ void TestWindowsService::init()
 
 	// copy the primary executable
 	const auto svcName = Q_T("testservice.exe");
+	const auto cfg =
 #ifdef QT_NO_DEBUG
-	const QString svcSrcPath{QCoreApplication::applicationDirPath() + Q_T("/../../TestService/release/") + svcName};
-	const auto deployType = Q_T("--release");
+		Q_T("release");
 #else
-	const QString svcSrcPath{QCoreApplication::applicationDirPath() + Q_T("/../../TestService/debug/") + svcName};
-	const auto deployType = Q_T("--debug");
+		Q_T("debug");
 #endif
+	const QString svcSrcPath{Q_T("%1/../../TestService/%2/%3").arg(QCoreApplication::applicationDirPath(), cfg, svcName)};
 	QVERIFY(QFile::exists(svcSrcPath));
 	QVERIFY(QFile::copy(svcSrcPath, svcDir.absoluteFilePath(svcName)));
 	const auto svcArg = Q_T("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(svcName)));
 
 	// copy svc lib into host lib dir (required by windeployqt)
-	const auto svcLib = LIB("Qt5Service");
+	const auto svcLib = LIB("Qt" QT_STRINGIFY(QT_VERSION_MAJOR) "Service");  // e.g. "Qt6Serviced.dll"
 	const QDir bLibDir{QCoreApplication::applicationDirPath() + Q_T("/../../../../../lib")};
 	QDir hLibDir{Q_T(QT_LIB_DIR)};
 	QVERIFY(bLibDir.exists(svcLib));
@@ -67,8 +67,8 @@ void TestWindowsService::init()
 
 	// run windeployqt
 	QProcess windepProc;
-	windepProc.setProgram(Q_T("windeployqt.exe"));  // should be in path
-	windepProc.setArguments({deployType,
+	windepProc.setProgram(Q_T(QT_LIB_DIR) + Q_T("/windeployqt.exe"));
+	windepProc.setArguments({Q_T("--") + cfg,
 	                         Q_T("--pdb"),
 	                         Q_T("--no-quick-import"),
 	                         Q_T("--no-translations"),
