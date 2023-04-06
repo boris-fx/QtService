@@ -16,6 +16,12 @@ public:
 	QString findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const override;
 	QtService::ServiceBackend *createServiceBackend(const QString &backend, QtService::Service *service) override;
 	QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) override;
+
+	template<typename ServiceLike>
+	static QString lockFilePath(const ServiceLike &s) {
+		// use backend() below to serve the debug_and_release tests' concurrent execution
+		return s.runtimeDir().absoluteFilePath(s.backend() + Q_T(".lock"));
+	}
 };
 
 #endif // STANDARDSERVICEPLUGIN_H

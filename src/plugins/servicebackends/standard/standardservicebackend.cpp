@@ -49,7 +49,7 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 
 	// create lock
 	qCDebug(logBackend) << "Creating service lock";
-	QLockFile lock{service()->runtimeDir().absoluteFilePath(Q_T("qstandard.lock"))};
+	QLockFile lock{StandardServicePlugin::lockFilePath(*service())};
 	lock.setStaleLockTime(std::numeric_limits<int>::max());  // disable stale locks
 	if (!lock.tryLock(5000)) {
 		qCCritical(logBackend) << "Failed to create service lock in"

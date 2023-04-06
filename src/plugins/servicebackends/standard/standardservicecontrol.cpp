@@ -20,7 +20,7 @@ StandardServiceControl::StandardServiceControl(bool debugMode, QString &&service
 	ServiceControl{std::move(serviceId), parent},
 	_debugMode{debugMode}
 {
-	qCDebug(logControl) << "Using lock file path:" << runtimeDir().absoluteFilePath(Q_T("qstandard.lock"));
+	qCDebug(logControl) << "Using lock file path:" << StandardServicePlugin::lockFilePath(*this);
 }
 
 QString StandardServiceControl::backend() const
@@ -197,7 +197,7 @@ QString StandardServiceControl::serviceName() const
 
 QSharedPointer<QLockFile> StandardServiceControl::statusLock() const
 {
-	const auto lock = QSharedPointer<QLockFile>::create(runtimeDir().absoluteFilePath(Q_T("qstandard.lock")));
+	const auto lock = QSharedPointer<QLockFile>::create(StandardServicePlugin::lockFilePath(*this));
 	lock->setStaleLockTime(std::numeric_limits<int>::max());  // disable stale locks
 	return lock;
 }
