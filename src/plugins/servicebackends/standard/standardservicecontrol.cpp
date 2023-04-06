@@ -11,6 +11,7 @@
 #else
 #include <csignal>
 #endif
+
 using namespace QtService;
 
 Q_LOGGING_CATEGORY(logControl, "qt.service.plugin.standard.control")
@@ -19,12 +20,12 @@ StandardServiceControl::StandardServiceControl(bool debugMode, QString &&service
 	ServiceControl{std::move(serviceId), parent},
 	_debugMode{debugMode}
 {
-	qCDebug(logControl) << "Using lock file path:" << runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock"));
+	qCDebug(logControl) << "Using lock file path:" << runtimeDir().absoluteFilePath(Q_T("qstandard.lock"));
 }
 
 QString StandardServiceControl::backend() const
 {
-	return _debugMode ? QStringLiteral("debug") : QStringLiteral("standard");
+	return _debugMode ? Q_T("debug") : Q_T("standard");
 }
 
 ServiceControl::SupportFlags StandardServiceControl::supportFlags() const
@@ -69,8 +70,7 @@ QVariant StandardServiceControl::callGenericCommand(const QByteArray &kind, cons
 	Q_UNUSED(args)
 	if (kind == "getPid")
 		return getPid();
-	else
-		return {};
+	return {};
 }
 
 bool StandardServiceControl::start()
@@ -89,7 +89,7 @@ bool StandardServiceControl::start()
 
 	const auto prepareProc = [&](QProcess *svcProc){
 		svcProc->setProgram(bin);
-		svcProc->setArguments({QStringLiteral("--backend"), backend()});
+		svcProc->setArguments({Q_T("--backend"), backend()});
 		svcProc->setWorkingDirectory(QDir::rootPath());
 	};
 
@@ -192,13 +192,12 @@ QString StandardServiceControl::serviceName() const
 	QFileInfo info{serviceId()};
 	if (info.isExecutable())
 		return QFileInfo{serviceId()}.completeBaseName();
-	else
-        return serviceId().split(QLatin1Char('/'), Qt::SkipEmptyParts).last();
+	return serviceId().split(QLatin1Char('/'), Qt::SkipEmptyParts).last();
 }
 
 QSharedPointer<QLockFile> StandardServiceControl::statusLock() const
 {
-	const auto lock = QSharedPointer<QLockFile>::create(runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock")));
+	const auto lock = QSharedPointer<QLockFile>::create(runtimeDir().absoluteFilePath(Q_T("qstandard.lock")));
 	lock->setStaleLockTime(std::numeric_limits<int>::max());  // disable stale locks
 	return lock;
 }
@@ -209,6 +208,5 @@ qint64 StandardServiceControl::getPid()
 	QString _h, _a;
 	if (statusLock()->getLockInfo(&pid, &_h, &_a))
 		return pid;
-	else
-		return -1;
+	return -1;
 }

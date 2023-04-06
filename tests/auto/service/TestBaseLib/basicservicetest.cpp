@@ -1,5 +1,6 @@
 #include "basicservicetest.h"
 #include <QtTest/QtTest>
+
 using namespace QtService;
 
 BasicServiceTest::BasicServiceTest(QObject *parent) :
@@ -34,7 +35,8 @@ void BasicServiceTest::testBasics()
 
 void BasicServiceTest::testNameDetection()
 {
-	auto nameControl = ServiceControl::createFromName(backend(), QStringLiteral("testservice"), QStringLiteral("de.skycoder42.qtservice.tests"), this);
+	auto nameControl = ServiceControl::createFromName(
+		backend(), Q_T("testservice"), Q_T("de.skycoder42.qtservice.tests"), this);
 	QVERIFY(nameControl);
 	QVERIFY(nameControl->serviceExists());
 	QCOMPARE(nameControl->serviceId(), control->serviceId());
@@ -49,7 +51,7 @@ void BasicServiceTest::testStart()
 		QThread::sleep(3);
 
 	socket = new QLocalSocket(this);
-	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
+	socket->connectToServer(Q_T("__qtservice_testservice"));
 	QVERIFY2(socket->waitForConnected(30000), qUtf8Printable(socket->errorString()));
 	stream.setDevice(socket);
 
@@ -137,7 +139,7 @@ void BasicServiceTest::testRestart()
 	TEST_STATUS(ServiceControl::Status::Running);
 
 	socket = new QLocalSocket(this);
-	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
+	socket->connectToServer(Q_T("__qtservice_testservice"));
 	QVERIFY2(socket->waitForConnected(30000), qUtf8Printable(socket->errorString()));
 	stream.setDevice(socket);
 
@@ -172,7 +174,7 @@ void BasicServiceTest::testStop()
 #ifndef Q_OS_WIN
 void BasicServiceTest::testStartExit()
 {
-	resetSettings({{QStringLiteral("exit"), true}});
+	resetSettings({{Q_T("exit"), true}});
 
 	TEST_STATUS(ServiceControl::Status::Stopped);
 
@@ -188,7 +190,7 @@ void BasicServiceTest::testStartExit()
 
 void BasicServiceTest::testStartFail()
 {
-	resetSettings({{QStringLiteral("fail"), true}});
+	resetSettings({{Q_T("fail"), true}});
 
 	TEST_STATUS(ServiceControl::Status::Stopped);
 
@@ -241,7 +243,7 @@ void BasicServiceTest::testDisable()
 
 QString BasicServiceTest::name()
 {
-	return QStringLiteral("testservice");
+	return Q_T("testservice");
 }
 
 bool BasicServiceTest::reportsStartErrors()
@@ -265,7 +267,7 @@ void BasicServiceTest::testCustomImpl()
 
 void BasicServiceTest::resetSettings(const QVariantHash &args)
 {
-	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	QSettings config{control->runtimeDir().absoluteFilePath(Q_T("test.conf")), QSettings::IniFormat};
 	QVERIFY(config.isWritable());
 	config.clear();
 	for(auto it = args.constBegin(); it != args.constEnd(); ++it)
@@ -280,7 +282,7 @@ void BasicServiceTest::performSocketTest()
 		QThread::sleep(3); //leave some time for the svc to actually stop
 
 	auto tcpSocket = new QTcpSocket(this);
-	tcpSocket->connectToHost(QStringLiteral("127.0.0.1"), 15843);
+	tcpSocket->connectToHost(Q_T("127.0.0.1"), 15843);
 	QVERIFY2(tcpSocket->waitForConnected(5000), qUtf8Printable(socket->errorString()));
 	TEST_STATUS(ServiceControl::Status::Running);
 

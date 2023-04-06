@@ -13,4 +13,6 @@
 #  define Q_SERVICE_EXPORT
 #endif
 
+#define Q_T QStringLiteral  // for mere brevity; name is inspired by Windows' _T
+
 #endif // QTSERVICE_GLOBAL_H
