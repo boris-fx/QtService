@@ -3,9 +3,9 @@
 
 using namespace QtService;
 
-BasicServiceTest::BasicServiceTest(QObject *parent) :
-	QObject(parent)
-{}
+BasicServiceTest::BasicServiceTest(QObject *parent) : QObject(parent)
+{
+}
 
 void BasicServiceTest::initTestCase()
 {
@@ -36,7 +36,7 @@ void BasicServiceTest::testBasics()
 void BasicServiceTest::testNameDetection()
 {
 	auto nameControl = ServiceControl::createFromName(
-		backend(), Q_T("testservice"), Q_T("de.skycoder42.qtservice.tests"), this);
+		backend(), name(), Q_T("de.skycoder42.qtservice.tests"), this);
 	QVERIFY(nameControl);
 	QVERIFY(nameControl->serviceExists());
 	QCOMPARE(nameControl->serviceId(), control->serviceId());
@@ -130,12 +130,11 @@ void BasicServiceTest::testRestart()
 	socket->deleteLater();
 
 	// blocking should only return after the server started, but for non blocking this may not be the case...
-	if(control->blocking() != ServiceControl::BlockMode::Blocking) {
+	if(control->blocking() != ServiceControl::BlockMode::Blocking)
 		for(auto i = 0; i < 10; ++i) {
 			QThread::msleep(500);
 			QCoreApplication::processEvents();
 		}
-	}
 	TEST_STATUS(ServiceControl::Status::Running);
 
 	socket = new QLocalSocket(this);
@@ -179,10 +178,9 @@ void BasicServiceTest::testStartExit()
 	TEST_STATUS(ServiceControl::Status::Stopped);
 
 	testFeature(ServiceControl::SupportFlag::Start);
-	if(control->start()) {
+	if(control->start())
 		if(control->blocking() != ServiceControl::BlockMode::Blocking)
 			QThread::sleep(3);
-	}
 
 	TEST_STATUS(ServiceControl::Status::Stopped);
 	resetSettings();
@@ -195,10 +193,9 @@ void BasicServiceTest::testStartFail()
 	TEST_STATUS(ServiceControl::Status::Stopped);
 
 	testFeature(ServiceControl::SupportFlag::Start);
-	if(control->start()) {
+	if(control->start())
 		if(control->blocking() != ServiceControl::BlockMode::Blocking)
 			QThread::sleep(3);
-	}
 
 	if(reportsStartErrors())
 		TEST_STATUS(ServiceControl::Status::Errored);
@@ -229,13 +226,12 @@ void BasicServiceTest::testDisable()
 	QVERIFY2(control->setEnabled(false), qUtf8Printable(control->error()));
 	QVERIFY2(!control->isEnabled(), qUtf8Printable(control->error()));
 
-	if (control->start()) {
+	if (control->start())
 		// start command succeded - wait for the service to not reach running status
 		for(auto i = 0; i < 5; ++i) {
 			QThread::msleep(1000);
 			TEST_STATUS(ServiceControl::Status::Stopped);
 		}
-	}
 
 	QVERIFY2(control->setEnabled(true), qUtf8Printable(control->error()));
 	QVERIFY2(control->isEnabled(), qUtf8Printable(control->error()));
@@ -270,8 +266,9 @@ void BasicServiceTest::resetSettings(const QVariantHash &args)
 	QSettings config{control->runtimeDir().absoluteFilePath(Q_T("test.conf")), QSettings::IniFormat};
 	QVERIFY(config.isWritable());
 	config.clear();
-	for(auto it = args.constBegin(); it != args.constEnd(); ++it)
+	for(auto it = args.constBegin(); it != args.constEnd(); ++it) {
 		config.setValue(it.key(), it.value());
+	}
 	config.sync();
 }
 
@@ -306,15 +303,12 @@ void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
 {
 	if(!control->supportFlags().testFlag(flag)) {
 		auto meta = QMetaEnum::fromType<ServiceControl::SupportFlags>();
-		if(flag == ServiceControl::SupportFlag::Status) {
-			QEXPECT_FAIL("",
-						 QByteArray(QByteArrayLiteral("feature ") + meta.valueToKey(static_cast<int>(flag)) + QByteArrayLiteral(" not supported by backend")).constData(),
-						 Continue);
-		} else {
-			QEXPECT_FAIL("",
-						 QByteArray(QByteArrayLiteral("feature ") + meta.valueToKey(static_cast<int>(flag)) + QByteArrayLiteral(" not supported by backend")).constData(),
-						 Abort);
-		}
+		QByteArray comment = Q_T("feature %1 not supported by backend")
+			.arg(QString::fromUtf8(meta.valueToKey(int(flag)))).toUtf8();
+		if(flag == ServiceControl::SupportFlag::Status)
+			QEXPECT_FAIL("", comment, Continue);
+		else
+			QEXPECT_FAIL("", comment, Abort);
 	}
 }
 
@@ -326,6 +320,7 @@ void BasicServiceTest::waitUntil(ServiceControl::Status status)
 		{ServiceControl::Status::Paused, {ServiceControl::Status::Pausing}},
 		{ServiceControl::Status::Errored, {ServiceControl::Status::Stopping, ServiceControl::Status::Starting}}
 	};
-	for(auto i = 0; i < 20 && statusMap[status].contains(control->status()); i++)
+	for(auto i = 0; i < 20 && statusMap[status].contains(control->status()); i++) {
 		QThread::msleep(500);
+	}
 }

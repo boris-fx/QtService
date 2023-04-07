@@ -13,6 +13,13 @@ using namespace QtService;
 #define LIB(x) Q_T(x "d.dll")
 #endif
 
+static const auto cfg =
+#ifdef QT_NO_DEBUG
+	Q_T("release");
+#else
+	Q_T("debug");
+#endif
+
 class TestWindowsService : public BasicServiceTest
 {
 	Q_OBJECT
@@ -36,8 +43,8 @@ QString TestWindowsService::backend()
 }
 
 QString TestWindowsService::name()
-{
-	return Q_T("testservice");
+{	// appending debug/release to serve the debug_and_release tests' concurrent execution
+	return Q_T("testservice_") + cfg;
 }
 
 void TestWindowsService::init()
@@ -53,12 +60,6 @@ void TestWindowsService::init()
 
 	// copy the primary executable
 	const auto svcName = Q_T("testservice.exe");
-	const auto cfg =
-#ifdef QT_NO_DEBUG
-		Q_T("release");
-#else
-		Q_T("debug");
-#endif
 	const QString svcSrcPath{Q_T("%1/../../TestService/%2/%3").arg(QCoreApplication::applicationDirPath(), cfg, svcName)};
 	QVERIFY(QFile::exists(svcSrcPath));
 	QVERIFY(QFile::copy(svcSrcPath, svcDir.absoluteFilePath(svcName)));
