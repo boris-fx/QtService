@@ -1,8 +1,10 @@
-#include <QString>
 #include <QtTest/QtTest>
-#include <QCoreApplication>
-#include <basicservicetest.h>
+#include <QCoreApplication>  // also brings QString
+#include <QTemporaryDir>
 #include <qt_windows.h>
+
+#include <basicservicetest.h>
+
 using namespace QtService;
 
 #ifdef QT_NO_DEBUG
@@ -40,9 +42,14 @@ QString TestWindowsService::name()
 
 void TestWindowsService::init()
 {
+	QVERIFY2(_svcDir.isValid(), qUtf8Printable(_svcDir.errorString()));
 	QDir svcDir{_svcDir.path()};
-	QVERIFY(svcDir.mkpath(Q_T(".")));
 	QVERIFY(svcDir.exists());
+
+	// make the directory accessible to the local System account
+	QString dirPath = QDir::toNativeSeparators(svcDir.absolutePath());
+	int rc = QProcess::execute(Q_T("icacls.exe"), {dirPath, Q_T("/q"), Q_T("/grant"), Q_T("System:RX")});
+	QCOMPARE(rc, EXIT_SUCCESS);
 
 	// copy the primary executable
 	const auto svcName = Q_T("testservice.exe");
@@ -57,7 +64,7 @@ void TestWindowsService::init()
 	QVERIFY(QFile::copy(svcSrcPath, svcDir.absoluteFilePath(svcName)));
 	const auto svcArg = Q_T("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(svcName)));
 
-	// copy svc lib into host lib dir (required by windeployqt)
+	// copy service lib into host lib dir (required by windeployqt)
 	const auto svcLib = LIB("Qt" QT_STRINGIFY(QT_VERSION_MAJOR) "Service");  // e.g. "Qt6Serviced.dll"
 	const QDir bLibDir{QCoreApplication::applicationDirPath() + Q_T("/../../../../../lib")};
 	QDir hLibDir{Q_T(QT_LIB_DIR)};
@@ -68,12 +75,8 @@ void TestWindowsService::init()
 	// run windeployqt
 	QProcess windepProc;
 	windepProc.setProgram(Q_T(QT_LIB_DIR) + Q_T("/windeployqt.exe"));
-	windepProc.setArguments({Q_T("--") + cfg,
-	                         Q_T("--pdb"),
-	                         Q_T("--no-quick-import"),
-	                         Q_T("--no-translations"),
-	                         Q_T("--compiler-runtime"),
-	                         svcName});
+	windepProc.setArguments({Q_T("--") + cfg, Q_T("--pdb"), Q_T("--compiler-runtime"),
+	                         Q_T("--no-quick-import"), Q_T("--no-translations"), svcName});
 	auto env = QProcessEnvironment::systemEnvironment();
 	env.insert(Q_T("VCINSTALLDIR"), Q_T("%1\\VC").arg(qEnvironmentVariable("VSINSTALLDIR")));
 	windepProc.setProcessEnvironment(env);
@@ -111,6 +114,7 @@ void TestWindowsService::init()
 	}
 	QVERIFY(svcDir.cdUp());
 
+	// create the service
 	_manager = OpenSCManagerW(nullptr, nullptr,
 	                          SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE | STANDARD_RIGHTS_REQUIRED);
 	QVERIFY2(_manager, qUtf8Printable(qt_error_string(GetLastError())));
