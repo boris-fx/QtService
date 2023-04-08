@@ -35,8 +35,10 @@ void BasicServiceTest::testBasics()
 
 void BasicServiceTest::testNameDetection()
 {
-	auto nameControl = ServiceControl::createFromName(
-		backend(), name(), Q_T("de.skycoder42.qtservice.tests"), this);
+	QString const domain = Q_T("de.skycoder42.qtservice.tests");
+	int start = name().startsWith(domain + Q_T(".")) ? domain.size() + 1 : 0;
+	QString baseName = name().mid(start);  // chop the domain (if any) from the name
+	auto nameControl = ServiceControl::createFromName(backend(), baseName, domain, this);
 	QVERIFY(nameControl);
 	QVERIFY(nameControl->serviceExists());
 	QCOMPARE(nameControl->serviceId(), control->serviceId());
